@@ -1,0 +1,172 @@
+@page "/Empleado/Index"
+
+@inject EmpleadoService empleadoService
+@inject NominaService nominaService
+@rendermode InteractiveServer
+
+<PageTitle>Index</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        @*Header*@
+        <div class="card-header text-center">
+            <div class="bg-primary text-white" style="border-radius: 5px;">
+                <h3><strong>Listado de Empleados</strong></h3>
+            </div>
+        </div>
+
+        @*Body*@
+        <div class="card-body">
+            @*Labesl*@
+            <div class="row">
+                <div class="col-3">
+                    <label class="form-label" for="Filtro"><strong>Filtrar por</strong></label>
+                </div>
+                <div class="col-4">
+                    <label class=" form-label" for="valorFiltro"><strong>B&uacute;squeda</strong></label>
+                </div>
+            </div>
+            @*Inputs y buttons*@
+            <div class="row">
+                @*Filtro*@
+                <div class="col-3">
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="" selected disabled>Elija una opci&oacute;n</option>
+                        <option value="Id">Id</option>
+                        <option value="apellidos">Apellidos</option>
+                        <option value="cedula">C&eacute;dula</option>
+                        <option value="profesion">Profesi&oacute;n</option>
+                        <option value="departamento ">Departamento</option>
+                        <option value="puesto ">Puesto de Trabajo</option>
+                    </InputSelect>
+                </div>
+                @*Busqueda*@
+                <div class="col-4">
+                    <div class="input-group">
+                        <input class="form-control" @bind-value="ValorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+                @*Restablecer*@
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-secondary bi bi-arrow-clockwise"
+                        @onclick="Restablecer">
+                    </button>
+                </div>
+
+                @*Boton Crear*@
+                <div class="text-end">
+                    <a href="/Empleado/Create" class="btn btn-primary">
+                        <span class="bi bi-person-fill-add mt-3"></span> Crear
+                    </a>
+                </div>
+            </div>
+            @*Tabla*@
+            <table class="table table-bordered text-center mt-4">
+                <thead class="bg-secondary text-white">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>C&eacute;dula</th>
+                        <th>Sueldo Neto</th>
+                        <th>Direcci&oacute;n</th>
+                        <th>Tel&eacute;fono</th>
+                        <th>Profesi&oacute;n</th>
+                        <th>Departamento</th>
+                        <th>Puesto</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+
+
+                <tbody>
+                    @foreach (var empleado in ListaEmpleados)
+                    {
+                        <tr>
+                            <td>@empleado.Nombre</td>
+                            <td>@empleado.Apellidos</td>
+                            <td>@empleado.Cedula</td>
+                            <td>$@empleado.Nomina?.SalarioNeto.ToString("N2")</td>
+                            <td>@empleado.Direccion</td>
+                            <td>@empleado.Telefono</td>
+                            <td>@empleado.Profesion</td>
+                            <td>@empleado.Departamento</td>
+                            <td>@empleado.PuestoTrabajo</td>
+                            <td>
+                                @*Editar*@
+                                <a href="/Empleado/Edit/@empleado.EmpleadoId" class="btn btn-outline-primary">
+                                    <span class="bi bi-pencil mt-3"></span>
+                                </a>
+                                @*Eliminar*@
+                                <a href="/Empleado/Delete/@empleado.EmpleadoId" class="btn btn-outline-danger">
+                                    <span class="bi bi-trash3 mt-3"></span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+        @*Footer*@
+        <div class="card-footer">
+            @if (ListaEmpleados?.Count() == 0)
+            {
+                <p style="color: red;"><strong>Total de Empleados: </strong>@ListaEmpleados?.Count()</p>
+            }
+            else
+            {
+                <p style="color: green;"><strong>Total de Empleados: </strong>@ListaEmpleados?.Count()</p>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    public List<Empleados> ListaEmpleados { get; set; } = new List<Empleados>();
+    public List<Nominas> ListaNomina { get; set; } = new List<Nominas>();
+
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaEmpleados = await empleadoService.Listar(e => true);
+        ListaNomina = await nominaService.Listar(e => true);
+
+        Filtro = string.Empty;
+        ValorFiltro = string.Empty;
+    }
+
+    private async Task Buscar()
+    {
+        if (ValorFiltro.Trim() != "")
+        {
+            if (Filtro == "Id" && int.TryParse(ValorFiltro, out int empleadoId))
+                ListaEmpleados = await empleadoService.Listar(t => t.EmpleadoId == empleadoId);
+            else if (Filtro == "nombre")
+                ListaEmpleados = await empleadoService.Listar(t => t.Nombre!.ToLower().Contains(ValorFiltro.ToLower()));
+            else if (Filtro == "apellidos")
+                ListaEmpleados = await empleadoService.Listar(t => t.Apellidos!.ToLower().Contains(ValorFiltro.ToLower()));
+            else if (Filtro == "cedula")
+                ListaEmpleados = await empleadoService.Listar(t => t.Cedula!.Contains(ValorFiltro));
+            else if (Filtro == "profesion")
+                ListaEmpleados = await empleadoService.Listar(t => t.Profesion!.ToLower().Contains(ValorFiltro.ToLower()));
+            else if (Filtro == "departamento")
+                ListaEmpleados = await empleadoService.Listar(t => t.Departamento!.ToLower().Contains(ValorFiltro.ToLower()));
+            else if (Filtro == "puesto ")
+                ListaEmpleados = await empleadoService.Listar(t => t.PuestoTrabajo!.ToLower().Contains(ValorFiltro.ToLower()));
+        }
+        else
+            ListaEmpleados = await empleadoService.Listar(t => true);
+    }
+
+    private async Task Restablecer()
+    {
+        ListaEmpleados = await empleadoService.Listar(t => true);
+        Filtro = string.Empty;
+        ValorFiltro = string.Empty;
+    }
+
+}

@@ -1,0 +1,94 @@
+@page "/Empleado/Delete/{EmpleadoId:int}"
+
+@inject EmpleadoService empleadoService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Delete</PageTitle>
+<div class="card">
+    <div class="shadow-lg">
+        @*Header*@
+        <div class="card-header text-center">
+            <h3><strong>Eliminar Empleado</strong></h3>
+        </div>
+        @*Body*@
+        <div class="card-body">
+
+            <div class="d-flex justify-content-center align-items-center" >
+                <h3><strong>¿Desea eliminar al Empleado @Empleado.Nombre @Empleado.Apellidos?</strong></h3>
+            </div>
+
+            <ul class="mt-4 p-0" style="list-style: none;">
+                <div class="d-flex justify-content-between align-items-start">
+
+                    @* Primera Columna *@
+                    <div class="px-3">
+                        <li style="font-size: 125%;"><strong>Nombre: </strong>@Empleado.Nombre</li>
+                        <li style="font-size: 125%;"><strong>Apellidos: </strong>@Empleado.Apellidos</li>
+                        <li style="font-size: 125%; color: green;">
+                            <strong>Sueldo Neto: </strong>$@Empleado.Nomina?.SalarioNeto.ToString("N2")
+                        </li>
+                    </div>
+
+                    @* Segunda Columna *@
+                    <div class="px-3">
+                        <li style="font-size: 125%;"><strong>Profesi&oacute;n: </strong>@Empleado.Profesion</li>
+                        <li style="font-size: 125%;"><strong>C&eacute;dula: </strong>@Empleado.Cedula</li>
+                        <li style="font-size: 125%;"><strong>Direcci&oacute;n: </strong>@Empleado.Direccion</li>
+                    </div>
+
+                    @* Tercera Columna *@
+                    <div class="px-3">
+                        <li style="font-size: 125%;"><strong>Tel&eacute;fono: </strong>@Empleado.Telefono</li>
+                        <li style="font-size: 125%;"><strong>Departamento: </strong>@Empleado.Departamento</li>
+                        <li style="font-size: 125%;"><strong>Puesto: </strong>@Empleado.PuestoTrabajo</li>
+                    </div>
+
+                </div>
+            </ul>
+        </div>
+        @*Footer*@
+        <div class="card-footer">
+            <div class="text-center">
+                <button type="button" class="btn btn-outline-primary bi bi-arrow-90deg-left" 
+                    @onclick="Volver"> Volver
+                </button>
+                <button type="button" class="btn btn-outline-danger" @onclick="Eliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Mensaje
+
+
+
+@code {
+    [Parameter]
+    public int EmpleadoId { get; set; }
+    private Empleados Empleado { get; set; } = new Empleados();
+    private string Mensaje = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Empleado = await empleadoService.Buscar(EmpleadoId);
+    }
+
+    private async Task Eliminar()
+    {
+        var elimando = await empleadoService.Eliminar(Empleado);
+
+        if (elimando)
+        {
+            Mensaje = "Eliminado correctamente";
+            await Task.Delay(2000);
+            Volver();
+        }
+        Mensaje = "No se ha podido eliminar correctamente";
+    }
+
+    private void Volver()
+    {
+        navigationManager.NavigateTo("/Empleado/Index");
+    }
+}

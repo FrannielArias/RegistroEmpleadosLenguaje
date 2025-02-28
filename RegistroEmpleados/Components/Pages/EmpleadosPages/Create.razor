@@ -1,0 +1,174 @@
+@page "/Empleado/Create"
+
+@inject EmpleadoService empleadoService
+@inject NominaService nominaService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Create</PageTitle>
+<EditForm Model="Empleado" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="container" style="padding-left: 50px; padding-right: 50px;">
+        <div class="card shadow-lg">
+            @*Header*@
+            <div class="card-header text-center">
+                <h3><strong>Crear Empleado</strong></h3>
+            </div>
+            @*Body*@
+            <div class="card-body" style="padding-left: 175px;">
+                @*Primera fila*@
+                <div class="row">
+                    @*Nombre*@
+                    <div class="col-3">
+                        <label class="form-label" for="name"><strong>Nombre</strong></label>
+                        <InputText class="form-control" id="name" @bind-Value="Empleado.Nombre"></InputText>
+                        <ValidationMessage For="(()=> Empleado.Nombre)" />
+                    </div>
+
+                    @*Apellidos*@
+                    <div class="col-3">
+                        <label class="form-label" for="lastName"><strong>Apellidos</strong></label>
+                        <InputText class="form-control" id="lastName" @bind-Value="Empleado.Apellidos"></InputText>
+                        <ValidationMessage For="(()=> Empleado.Apellidos)" />
+                    </div>
+
+                    @*Profesion*@
+                    <div class="col-3">
+                        <label class="form-label" for="profesion"><strong>Profesi&oacute;n</strong></label>
+                        <InputText class="form-control" id="profesion" @bind-Value="Empleado.Profesion"></InputText>
+                        <ValidationMessage For="(()=> Empleado.Profesion)" />
+                    </div>
+                </div>
+
+                @*Segunda Fila*@
+                <div class="row mt-4">
+                    @*Cedula*@
+                    <div class="col-3">
+                        <label class="form-label" for="employeeId"><strong>C&eacute;dula</strong></label>
+                        <InputText class="form-control" id="employeeId" @bind-Value="Empleado.Cedula"
+                            placeholder="402-1234567-2">
+                        </InputText>
+                        <ValidationMessage For="(()=> Empleado.Cedula)" />
+                    </div>
+
+                    @*Direccion*@
+                    <div class="col-3">
+                        <label class="form-label" for="direction"><strong>Direcci&oacute;n</strong></label>
+                        <InputText class="form-control" id="direction" @bind-Value="Empleado.Direccion"></InputText>
+                        <ValidationMessage For="(()=> Empleado.Direccion)" />
+                    </div>
+
+                    @*Telefono*@
+                    <div class="col-3">
+                        <label class="form-label" for="cellphone"><strong>Tel&eacute;fono</strong></label>
+                        <InputText class="form-control" id="cellphone" @bind-Value="Empleado.Telefono"
+                            placeholder="xxx-xxx-xxxx">
+                        </InputText>
+                        <ValidationMessage For="(()=> Empleado.Telefono)" />
+                    </div>
+                </div>
+                @*Tercer Fila*@
+                <div class="row mt-4">
+                    @*Departamento*@
+                    <div class="col-3">
+                        <label class="form-label" for="department"><strong>Departamento</strong></label>
+                        <InputText class="form-control" id="department" @bind-Value="Empleado.Departamento"
+                            placeholder="Recursos Humanos">
+
+                        </InputText>
+                        <ValidationMessage For="(()=> Empleado.Departamento)" />
+                    </div>
+
+                    @*Puesto*@
+                    <div class="col-3">
+                        <label class="form-label" for="workStation"><strong>Puesto de Trabajo</strong></label>
+                        <InputText class="form-control" id="workStation" @bind-Value="Empleado.PuestoTrabajo"
+                            placeholder="Vendedor">
+                        </InputText>
+                        <ValidationMessage For="(()=> Empleado.PuestoTrabajo)" />
+                    </div>
+                </div>
+
+                @*Nómina*@
+                <div class="border border-success p-3 mt-4 custom-border">
+                    <div class="text-center">
+                        <h3><strong>N&oacute;mina del Empleado</strong></h3>
+                    </div>
+
+                    @*Primera Fila*@
+                    <div class="row">
+                        @*SueldoBruto*@
+                        <div class="col-3">
+                            <label class="form-label" for="grossSalary"><strong>Sueldo Bruto</strong></label>
+                            <InputNumber class="form-control" id="grossSalary"
+                                @bind-Value="Empleado.Nomina.SalarioBruto">
+                                <ValidationMessage For="(()=> Empleado.Nomina.SalarioBruto)" />
+                            </InputNumber>
+                        </div>
+
+                        @*HorasExtras*@
+                        <div class="col-3">
+                            <label class="form-label" for="extraHours"><strong>Horas Extras</strong></label>
+                            <InputNumber class="form-control" id="extraHours" @bind-Value="Empleado.Nomina.HorasExtras">
+                            </InputNumber>
+                        </div>
+
+                        @*Préstamos*@
+                        <div class="col-3">
+                            <label class="form-label" for="loan"><strong>Pr&eacute;stamos</strong></label>
+                            <InputNumber class="form-control" id="loan" @bind-Value="Empleado.Nomina.Prestamo">
+                            </InputNumber>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            @*Footer*@
+            <div class="card-footer text-center">
+
+                @*Boton Volver*@
+                <button type="button" class="btn btn-outline-primary bi bi-arrow-90deg-left" @onclick="Volver"> Volver
+                </button>
+
+                @*Boton Guardar*@
+                <button type="submit" class="btn btn-outline-success bi bi-floppy"> Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+<div style="color: green; font-size: 110%;">
+    @Mensaje
+</div>
+
+
+
+@code {
+    // public Empleados Empleado { get; set; } = new Empleados();
+    private Empleados Empleado { get; set; } = new() { Nomina = new Nominas() };
+
+    private Nominas Nomina { get; set; } = new Nominas();
+
+    public string Mensaje { get; set; } = string.Empty;
+
+    private async Task Guardar()
+    {
+        var guardo = await empleadoService.Guardar(Empleado);
+
+        if (guardo)
+        {
+            Empleado = new Empleados { Nomina = new Nominas() };
+            Mensaje = "Empleado Guardado correctamente";
+            await Task.Delay(3000);
+            Volver();
+
+        }
+        Mensaje = "No se pudo guardar correctamente";
+    }
+
+    private void Volver()
+    {
+        navigationManager.NavigateTo("/Empleado/Index");
+    }
+}
